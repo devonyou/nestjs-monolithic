@@ -6,7 +6,7 @@ import {
     InternalServerErrorException,
     NestInterceptor,
 } from '@nestjs/common';
-import { catchError, Observable, timeout } from 'rxjs';
+import { catchError, Observable, throwError, timeout } from 'rxjs';
 import { ResponseTime } from '../decorator/response.time.decorator';
 
 @Injectable()
@@ -19,8 +19,10 @@ export class ResponseTimeInterceptor implements NestInterceptor {
         return next.handle().pipe(
             timeout(limit),
             catchError(err => {
-                console.log(err);
-                throw new InternalServerErrorException('timeout response');
+                if (err.name === 'TimeoutError') {
+                    throw new InternalServerErrorException('timeout response');
+                }
+                return throwError(() => err);
             }),
         );
     }

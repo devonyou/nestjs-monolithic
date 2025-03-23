@@ -1,4 +1,4 @@
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
+import { CanActivate, ExecutionContext, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Observable } from 'rxjs';
 import { RBAC } from 'src/common/decorator/rabc.decorator';
@@ -19,8 +19,8 @@ export class RBACGuard implements CanActivate {
         if (isPublic) return true;
         if (!Object.values(Role).includes(role)) return true;
 
-        if (!user) throw new UnauthorizedException();
+        if (!user) throw new UnauthorizedException(); // 401
 
-        return userRole <= role;
+        return userRole <= role; // 403
     }
 }
