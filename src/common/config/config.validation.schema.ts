@@ -13,4 +13,6 @@ export default Joi.object({
     DB_URL: Joi.string().required(),
     ACCESS_TOKEN_SECRET: Joi.string().required(),
     REFRESH_TOKEN_SECRET: Joi.string().required(),
+    REDIS_HOST: Joi.string().required(),
+    REDIS_PORT: Joi.number().required(),
 });

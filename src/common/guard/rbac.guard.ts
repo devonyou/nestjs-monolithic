@@ -1,8 +1,9 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Observable } from 'rxjs';
 import { RBAC } from 'src/common/decorator/rabc.decorator';
 import { Role } from 'src/common/entities/user.entity';
+import { Public } from '../decorator/public.decorator';
 
 @Injectable()
 export class RBACGuard implements CanActivate {
@@ -13,10 +14,12 @@ export class RBACGuard implements CanActivate {
         const role = this.reflector.get(RBAC, context.getHandler());
         const user = req?.user;
         const userRole = user?.role;
+        const isPublic = this.reflector.get(Public, context.getHandler());
 
-        if (role === undefined) return true;
-        if (!user || !userRole) return false;
-        if (!Object.values(Role).includes(userRole)) return false;
+        if (isPublic) return true;
+        if (!Object.values(Role).includes(role)) return true;
+
+        if (!user) throw new UnauthorizedException();
 
         return userRole <= role;
     }

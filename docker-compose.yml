@@ -34,3 +34,9 @@ services:
             MYSQL_PASSWORD: 'pass1234'
             MYSQL_DATABASE: user
             MYSQL_ROOT_PASSWORD: 'pass1234'
+    redis:
+        image: redis:7-alpine
+        ports:
+            - '6379:6379'
+        volumes:
+            - ./redis:/data

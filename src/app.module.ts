@@ -4,9 +4,13 @@ import ConfigValidationSchema from 'src/common/config/config.validation.schema';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { AccessGuard } from './auth/guard/access.guard';
-import { RBACGuard } from './auth/guard/rbac.guard';
+import { User } from './common/entities/user.entity';
+import { RBACGuard } from './common/guard/rbac.guard';
+import { ResponseTimeInterceptor } from './common/interceptor/response.time.interceptor';
+import { ThrottleInterceptor } from './common/interceptor/throttle.interceptor';
+import { RedisModule } from './redis/redis.module';
 
 @Module({
     imports: [
@@ -19,7 +23,7 @@ import { RBACGuard } from './auth/guard/rbac.guard';
             useFactory: (configService: ConfigService) => ({
                 type: configService.get<string>('DB_TYPE') as 'mysql',
                 url: configService.get<string>('DB_URL'),
-                entities: [],
+                entities: [User],
                 synchronize: configService.get<string>('ENV') === 'dev' ? true : false,
                 ...(configService.get<string>('ENV') === 'prod' && {
                     ssl: {
@@ -31,9 +35,12 @@ import { RBACGuard } from './auth/guard/rbac.guard';
         }),
         UserModule,
         AuthModule,
+        RedisModule,
     ],
     controllers: [],
     providers: [
+        { provide: APP_INTERCEPTOR, useClass: ResponseTimeInterceptor },
+        { provide: APP_INTERCEPTOR, useClass: ThrottleInterceptor },
         { provide: APP_GUARD, useClass: AccessGuard },
         { provide: APP_GUARD, useClass: RBACGuard },
     ],

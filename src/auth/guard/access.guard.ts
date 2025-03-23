@@ -11,11 +11,8 @@ export class AccessGuard extends AuthGuard('access') {
     }
 
     canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
-        const req = context.switchToHttp().getRequest();
         const isPublic = this.reflector.get(Public, context.getHandler());
-
         if (isPublic) return true;
-        if (req?.user?.type !== 'access') throw new UnauthorizedException('Bad access token');
-        return true;
+        return super.canActivate(context);
     }
 }
