@@ -24,12 +24,4 @@ export class RedisService {
     getRedisClient() {
         return this.redisClient;
     }
-
-    async get(key: string) {
-        return this.redisClient.get(key);
-    }
-
-    async set(key: string, value: string) {
-        return this.redisClient.set(key, value);
-    }
 }

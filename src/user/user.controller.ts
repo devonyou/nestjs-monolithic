@@ -1,10 +1,11 @@
-import { Controller, Get, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Body, Patch, Param, Delete, UseInterceptors, Req } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { RBAC } from 'src/common/decorator/rabc.decorator';
 import { Role } from 'src/common/entities/user.entity';
 import { FindUsersDto } from './dto/find-users.dto';
 import { UserId } from 'src/common/decorator/user.id.decorator';
+import { TransactionInterceptor } from 'src/common/interceptor/transaction.interceptor';
 
 @Controller('user')
 export class UserController {
@@ -23,9 +24,9 @@ export class UserController {
     }
 
     @Patch()
-    @RBAC(Role.user)
-    update(@UserId() userId: number, @Body() updateUserDto: UpdateUserDto) {
-        return this.userService.update(userId, updateUserDto);
+    @UseInterceptors(TransactionInterceptor)
+    async update(@UserId() userId: number, @Body() updateUserDto: UpdateUserDto, @Req() req) {
+        return await this.userService.update(userId, updateUserDto, req.queryRunner);
     }
 
     @Delete(':id')

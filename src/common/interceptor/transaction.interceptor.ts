@@ -1,5 +1,5 @@
 import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
-import { catchError, concatMap, finalize, Observable, pipe } from 'rxjs';
+import { catchError, concatMap, finalize, Observable, tap } from 'rxjs';
 import { DataSource } from 'typeorm';
 
 @Injectable()
@@ -17,8 +17,9 @@ export class TransactionInterceptor implements NestInterceptor {
         request.queryRunner = queryRunner;
 
         return next.handle().pipe(
-            concatMap(async () => {
+            concatMap(async res => {
                 await queryRunner.commitTransaction();
+                return res;
             }),
             catchError(async err => {
                 await queryRunner.rollbackTransaction();

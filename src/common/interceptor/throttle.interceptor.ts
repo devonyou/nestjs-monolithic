@@ -10,6 +10,7 @@ export class ThrottleInterceptor implements NestInterceptor {
 
     constructor(private readonly redisService: RedisService) {
         this.redisClient = redisService.getRedisClient();
+        console.log(this.redisClient);
     }
 
     async intercept(context: ExecutionContext, next: CallHandler<any>): Promise<Observable<any>> {
@@ -20,16 +21,16 @@ export class ThrottleInterceptor implements NestInterceptor {
         const limit = 5;
         const ttl = 60;
 
-        const count = +(await this.redisClient.get(key)) || 1;
+        const count = +(await this.redisClient.get(key)) || 0;
 
         if (count >= limit) {
             throw new ForbiddenException('Too many requests, please try again later.');
         }
 
-        if (count === 1) {
+        if (count === 0) {
             await this.redisClient.setex(key, ttl, 1);
         } else {
-            await this.redisClient.incr(key);
+            await this.redisClient.set(key, count + 1);
         }
 
         return next.handle();
