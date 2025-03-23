@@ -45,7 +45,7 @@ export class UserService {
     }
 
     async remove(userId: number) {
-        await this.userRepository.delete(userId);
-        return { success: userId };
+        const result = await this.userRepository.delete(userId);
+        return { success: result.affected };
     }
 }

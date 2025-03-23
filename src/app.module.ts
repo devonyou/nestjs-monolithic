@@ -14,6 +14,7 @@ import { RedisModule } from './redis/redis.module';
 import { ProductModule } from './product/product.module';
 import { Product } from './common/entities/product.entity';
 import { Address } from './common/entities/address.entity';
+import { AddressModule } from './address/address.module';
 
 @Module({
     imports: [
@@ -40,6 +41,7 @@ import { Address } from './common/entities/address.entity';
         AuthModule,
         RedisModule,
         ProductModule,
+        AddressModule,
     ],
     controllers: [],
     providers: [
