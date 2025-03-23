@@ -11,6 +11,9 @@ import { RBACGuard } from './common/guard/rbac.guard';
 import { ResponseTimeInterceptor } from './common/interceptor/response.time.interceptor';
 import { ThrottleInterceptor } from './common/interceptor/throttle.interceptor';
 import { RedisModule } from './redis/redis.module';
+import { ProductModule } from './product/product.module';
+import { Product } from './common/entities/product.entity';
+import { Address } from './common/entities/address.entity';
 
 @Module({
     imports: [
@@ -23,7 +26,7 @@ import { RedisModule } from './redis/redis.module';
             useFactory: (configService: ConfigService) => ({
                 type: configService.get<string>('DB_TYPE') as 'mysql',
                 url: configService.get<string>('DB_URL'),
-                entities: [User],
+                entities: [User, Product, Address],
                 synchronize: configService.get<string>('ENV') === 'dev' ? true : false,
                 ...(configService.get<string>('ENV') === 'prod' && {
                     ssl: {
@@ -36,6 +39,7 @@ import { RedisModule } from './redis/redis.module';
         UserModule,
         AuthModule,
         RedisModule,
+        ProductModule,
     ],
     controllers: [],
     providers: [
