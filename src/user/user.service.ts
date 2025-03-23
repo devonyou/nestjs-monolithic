@@ -1,26 +1,50 @@
 import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Like, Repository } from 'typeorm';
+import { User } from 'src/common/entities/user.entity';
+import { FindUsersDto } from './dto/find-users.dto';
+import { ConfigService } from '@nestjs/config';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
-    create(createUserDto: CreateUserDto) {
-        return 'This action adds a new user';
+    constructor(
+        @InjectRepository(User) private readonly userRepository: Repository<User>,
+        private readonly configService: ConfigService,
+    ) {}
+
+    findAll(dto: FindUsersDto) {
+        const { email } = dto;
+        return this.userRepository.find({
+            where: {
+                ...(email ? { email: Like(`%${email}%`) } : {}),
+            },
+        });
     }
 
-    findAll() {
-        return `This action returns all user`;
+    findOne(userId: number) {
+        return this.userRepository.findOneBy({ id: userId });
     }
 
-    findOne(id: number) {
-        return `This action returns a #${id} user`;
+    async update(userId: number, dto: UpdateUserDto) {
+        const { password, ...restDto } = dto;
+
+        let hashedPassword;
+        if (password) {
+            const hashRounds = this.configService.get<number>('HASH_ROUNDS');
+            hashedPassword = await bcrypt.hash(password, +hashRounds);
+        }
+
+        await this.userRepository.update(userId, {
+            ...restDto,
+            ...(password ? { password: hashedPassword } : {}),
+        });
+
+        return this.userRepository.findOneBy({ id: userId });
     }
 
-    update(id: number, updateUserDto: UpdateUserDto) {
-        return `This action updates a #${id} user`;
-    }
-
-    remove(id: number) {
-        return `This action removes a #${id} user`;
+    remove(userId: number) {
+        return this.userRepository.delete(userId);
     }
 }

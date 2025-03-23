@@ -1,6 +1,7 @@
 import { Exclude } from 'class-transformer';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { BaseEntity } from './base.entity';
+import { Address } from './address.entity';
 
 export enum Role {
     admin = 0,
@@ -18,8 +19,8 @@ export class User extends BaseEntity {
 
     @Column()
     @Exclude({
-        toPlainOnly: true, // 응답시
-        // toClassOnly:true // 요청시
+        toPlainOnly: true,
+        // toClassOnly:true
     })
     password: string;
 
@@ -34,4 +35,7 @@ export class User extends BaseEntity {
 
     @Column({ nullable: true })
     age: number;
+
+    @OneToMany(() => Address, address => address.user)
+    addresses: Address[];
 }

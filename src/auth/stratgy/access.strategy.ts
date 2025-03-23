@@ -14,7 +14,6 @@ export class AccessStrategy extends PassportStrategy(Strategy, 'access') {
     }
 
     validate(payload): any {
-        console.log('AccessStrategy.validate', payload);
         return payload;
     }
 }

@@ -22,7 +22,7 @@ export class UserRegisterDto {
     @IsOptional()
     profile?: string;
 
-    @IsString()
+    @IsNumber()
     @IsOptional()
     age?: number;
 }
