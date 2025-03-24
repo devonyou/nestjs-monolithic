@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConditionalModule, ConfigModule, ConfigService } from '@nestjs/config';
 import ConfigValidationSchema from 'src/common/config/config.validation.schema';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './user/user.module';
@@ -23,6 +23,8 @@ import { OrderAddress } from './common/entities/order.address';
 import { PagingModule } from './paging/paging.module';
 import { RedisModule } from '@liaoliaots/nestjs-redis';
 import { AwsModule } from './aws/aws.module';
+import { WorkerModule } from './worker/worker.module';
+import { BullModule } from '@nestjs/bullmq';
 
 @Module({
     imports: [
@@ -56,6 +58,18 @@ import { AwsModule } from './aws/aws.module';
             inject: [ConfigService],
         }),
 
+        BullModule.forRootAsync({
+            useFactory: (configService: ConfigService) => ({
+                connection: {
+                    host: configService.get<string>('REDIS_HOST'),
+                    port: configService.get<number>('REDIS_PORT'),
+                },
+            }),
+            inject: [ConfigService],
+        }),
+
+        ConditionalModule.registerWhen(WorkerModule, (env: NodeJS.ProcessEnv) => env['TYPE'] === 'worker'),
+
         UserModule,
         AuthModule,
         ProductModule,
@@ -63,7 +77,6 @@ import { AwsModule } from './aws/aws.module';
         MappingModule,
         OrderModule,
         PagingModule,
-        // AwsModule,
     ],
     controllers: [],
     providers: [

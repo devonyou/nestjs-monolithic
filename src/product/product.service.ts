@@ -6,17 +6,20 @@ import { Product } from 'src/common/entities/product.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindAllProductDto } from './dto/find-all-product.dto';
 import { PagingService } from 'src/paging/paging.service';
-import { executionAsyncResource } from 'async_hooks';
+import { InjectQueue } from '@nestjs/bullmq';
+import { Queue } from 'bullmq';
 
 @Injectable()
 export class ProductService {
     constructor(
         @InjectRepository(Product) private readonly productRepository: Repository<Product>,
         private readonly pagingService: PagingService,
+        @InjectQueue('product-thumbnail') private readonly thumbnailQueue: Queue,
     ) {}
 
     async create(createProductDto: CreateProductDto) {
         const product = await this.productRepository.save(createProductDto);
+        await this.createThumbnail(product.id);
         return this.findOne(product.id);
     }
 
@@ -53,5 +56,22 @@ export class ProductService {
     async remove(id: number) {
         const result = await this.productRepository.delete(id);
         return { success: result.affected };
+    }
+
+    async createThumbnail(productId: number) {
+        await this.thumbnailQueue.add(
+            'thumbnail',
+            {
+                videoId: `${productId}`,
+            },
+            {
+                priority: 1,
+                delay: 100,
+                lifo: true,
+                attempts: 3,
+                removeOnComplete: true,
+                removeOnFail: false,
+            },
+        );
     }
 }
