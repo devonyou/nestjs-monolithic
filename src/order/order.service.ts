@@ -23,8 +23,9 @@ export class OrderService {
             .createQueryBuilder('p')
             .leftJoin('p.mappings', 'm', 'm.userId = :userId', { userId })
             .select(['p.id AS productId', 'p.productName AS productName', 'IFNULL(m.price, p.price) AS price'])
-            .where('p.id IN (:productIds)', { productIds: productIds })
+            .where('p.id IN (:...productIds)', { productIds })
             .andWhere('IFNULL(m.hidden, p.hidden) <> TRUE')
+            .setLock('pessimistic_write', undefined, ['p', 'm'])
             .getRawMany();
 
         if (productIds.length !== products.length) {

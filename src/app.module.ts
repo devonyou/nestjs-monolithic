@@ -63,7 +63,7 @@ import { AwsModule } from './aws/aws.module';
         MappingModule,
         OrderModule,
         PagingModule,
-        AwsModule,
+        // AwsModule,
     ],
     controllers: [],
     providers: [
