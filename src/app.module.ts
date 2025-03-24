@@ -22,6 +22,7 @@ import { OrderProduct } from './common/entities/order.product';
 import { OrderAddress } from './common/entities/order.address';
 import { PagingModule } from './paging/paging.module';
 import { RedisModule } from '@liaoliaots/nestjs-redis';
+import { AwsModule } from './aws/aws.module';
 
 @Module({
     imports: [
@@ -62,6 +63,7 @@ import { RedisModule } from '@liaoliaots/nestjs-redis';
         MappingModule,
         OrderModule,
         PagingModule,
+        AwsModule,
     ],
     controllers: [],
     providers: [

@@ -25,4 +25,7 @@ export class Product extends BaseEntity {
 
     @OneToMany(() => OrderProduct, orderProduct => orderProduct.product)
     orderProducts: OrderProduct[];
+
+    @Column({ nullable: true })
+    thumbnail?: string;
 }
