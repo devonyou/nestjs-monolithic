@@ -17,7 +17,8 @@
         "test:watch": "jest --watch",
         "test:cov": "jest --coverage",
         "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-        "test:e2e": "jest --config ./test/jest-e2e.json"
+        "test:e2e": "jest --config ./test/jest-e2e.json",
+        "test:auth:watch": "jest --testPathPattern=src/auth --coverage --collectCoverageFrom=src/auth/** --watch"
     },
     "dependencies": {
         "@aws-sdk/client-s3": "^3.772.0",
@@ -82,7 +83,9 @@
             "json",
             "ts"
         ],
-        "rootDir": "src",
+        "roots": [
+            "src"
+        ],
         "testRegex": ".*\\.spec\\.ts$",
         "transform": {
             "^.+\\.(t|j)s$": "ts-jest"
@@ -90,7 +93,25 @@
         "collectCoverageFrom": [
             "**/*.(t|j)s"
         ],
-        "coverageDirectory": "../coverage",
-        "testEnvironment": "node"
+        "coveragePathIgnorePatterns": [
+            "module.ts",
+            "dto.ts",
+            "entity.ts",
+            "guard.ts",
+            "middleware.ts",
+            "strategy.ts",
+            "decorator.ts",
+            "pipe.ts",
+            "common/*",
+            "worker/*",
+            "aws/*",
+            "paging/*",
+            "main.ts"
+        ],
+        "coverageDirectory": "./coverage",
+        "testEnvironment": "node",
+        "moduleNameMapper": {
+            "src/(.*)": "<rootDir>/src/$1"
+        }
     }
 }

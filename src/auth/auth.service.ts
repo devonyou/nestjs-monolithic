@@ -31,7 +31,7 @@ export class AuthService {
         return this.userRepository.findOneBy({ id: newUser.id });
     }
 
-    private parseBasicToken(rawToken: string) {
+    parseBasicToken(rawToken: string) {
         const [prefix, token] = rawToken.split(' ');
 
         if (!prefix || !token) throw new UnauthorizedException();
@@ -58,7 +58,7 @@ export class AuthService {
         };
     }
 
-    private async authenticate(email, password) {
+    async authenticate(email, password) {
         const user = await this.userRepository.findOneBy({ email });
         if (!user) throw new UnauthorizedException('bad user data');
 
@@ -68,7 +68,7 @@ export class AuthService {
         return user;
     }
 
-    private async issueToken(user: User, isRefreshToken: boolean) {
+    async issueToken(user: User, isRefreshToken: boolean) {
         const ACCESS_TOKEN_SECRET = this.configService.get('ACCESS_TOKEN_SECRET');
         const REFRESH_TOKEN_SECRET = this.configService.get('REFRESH_TOKEN_SECRET');
         return await this.jwtService.signAsync(
