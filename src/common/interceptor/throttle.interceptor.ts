@@ -10,7 +10,6 @@ export class ThrottleInterceptor implements NestInterceptor {
 
     constructor(private readonly redisService: RedisService) {
         this.redisClient = redisService.getRedisClient();
-        console.log(this.redisClient);
     }
 
     async intercept(context: ExecutionContext, next: CallHandler<any>): Promise<Observable<any>> {

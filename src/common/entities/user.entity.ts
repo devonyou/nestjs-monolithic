@@ -1,7 +1,8 @@
 import { Exclude } from 'class-transformer';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToMany, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { BaseEntity } from './base.entity';
 import { Address } from './address.entity';
+import { Mapping } from './mapping.entity';
 
 export enum Role {
     admin = 0,
@@ -38,4 +39,7 @@ export class User extends BaseEntity {
 
     @OneToMany(() => Address, address => address.user)
     addresses: Address[];
+
+    @OneToMany(() => Mapping, mapping => mapping.user)
+    mappings: Mapping[];
 }

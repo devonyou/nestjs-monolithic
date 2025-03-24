@@ -15,6 +15,8 @@ import { ProductModule } from './product/product.module';
 import { Product } from './common/entities/product.entity';
 import { Address } from './common/entities/address.entity';
 import { AddressModule } from './address/address.module';
+import { MappingModule } from './mapping/mapping.module';
+import { Mapping } from './common/entities/mapping.entity';
 
 @Module({
     imports: [
@@ -27,7 +29,7 @@ import { AddressModule } from './address/address.module';
             useFactory: (configService: ConfigService) => ({
                 type: configService.get<string>('DB_TYPE') as 'mysql',
                 url: configService.get<string>('DB_URL'),
-                entities: [User, Product, Address],
+                entities: [User, Product, Address, Mapping],
                 synchronize: configService.get<string>('ENV') === 'dev' ? true : false,
                 ...(configService.get<string>('ENV') === 'prod' && {
                     ssl: {
@@ -42,6 +44,7 @@ import { AddressModule } from './address/address.module';
         RedisModule,
         ProductModule,
         AddressModule,
+        MappingModule,
     ],
     controllers: [],
     providers: [
