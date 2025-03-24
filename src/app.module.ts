@@ -21,6 +21,7 @@ import { OrderModule } from './order/order.module';
 import { Order } from './common/entities/order.entity';
 import { OrderProduct } from './common/entities/order.product';
 import { OrderAddress } from './common/entities/order.address';
+import { PagingModule } from './paging/paging.module';
 
 @Module({
     imports: [
@@ -50,6 +51,7 @@ import { OrderAddress } from './common/entities/order.address';
         AddressModule,
         MappingModule,
         OrderModule,
+        PagingModule,
     ],
     controllers: [],
     providers: [

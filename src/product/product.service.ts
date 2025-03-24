@@ -5,23 +5,40 @@ import { Like, Repository } from 'typeorm';
 import { Product } from 'src/common/entities/product.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindAllProductDto } from './dto/find-all-product.dto';
+import { PagingService } from 'src/paging/paging.service';
+import { executionAsyncResource } from 'async_hooks';
 
 @Injectable()
 export class ProductService {
-    constructor(@InjectRepository(Product) private readonly productRepository: Repository<Product>) {}
+    constructor(
+        @InjectRepository(Product) private readonly productRepository: Repository<Product>,
+        private readonly pagingService: PagingService,
+    ) {}
 
     async create(createProductDto: CreateProductDto) {
         const product = await this.productRepository.save(createProductDto);
         return this.findOne(product.id);
     }
 
-    findAll(dto: FindAllProductDto) {
+    async findAll(dto: FindAllProductDto) {
         const { productName } = dto;
-        return this.productRepository.find({
-            where: {
-                ...(productName ? { productName: Like(`%${productName}%`) } : {}),
-            },
-        });
+        // return this.productRepository.find({
+        //     where: {
+        //         ...(productName ? { productName: Like(`%${productName}%`) } : {}),
+        //     },
+        // });
+        const qb = this.productRepository
+            .createQueryBuilder()
+            .where(productName ? { productName: Like(`%${productName}%`) } : {});
+
+        const { nextCursor } = await this.pagingService.applyCursorPagination(qb, dto);
+
+        const [data, count] = await qb.getManyAndCount();
+        return {
+            data,
+            count,
+            nextCursor,
+        };
     }
 
     findOne(id: number) {
