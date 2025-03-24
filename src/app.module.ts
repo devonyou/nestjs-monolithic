@@ -10,7 +10,6 @@ import { User } from './common/entities/user.entity';
 import { RBACGuard } from './common/guard/rbac.guard';
 import { ResponseTimeInterceptor } from './common/interceptor/response.time.interceptor';
 import { ThrottleInterceptor } from './common/interceptor/throttle.interceptor';
-import { RedisModule } from './redis/redis.module';
 import { ProductModule } from './product/product.module';
 import { Product } from './common/entities/product.entity';
 import { Address } from './common/entities/address.entity';
@@ -22,6 +21,7 @@ import { Order } from './common/entities/order.entity';
 import { OrderProduct } from './common/entities/order.product';
 import { OrderAddress } from './common/entities/order.address';
 import { PagingModule } from './paging/paging.module';
+import { RedisModule } from '@liaoliaots/nestjs-redis';
 
 @Module({
     imports: [
@@ -44,9 +44,19 @@ import { PagingModule } from './paging/paging.module';
                 logging: configService.get<string>('ENV') === 'dev' ? true : false,
             }),
         }),
+        RedisModule.forRootAsync({
+            imports: [ConfigModule],
+            useFactory: async (configService: ConfigService) => ({
+                config: {
+                    host: configService.getOrThrow('REDIS_HOST'),
+                    port: configService.getOrThrow('REDIS_PORT'),
+                },
+            }),
+            inject: [ConfigService],
+        }),
+
         UserModule,
         AuthModule,
-        RedisModule,
         ProductModule,
         AddressModule,
         MappingModule,
