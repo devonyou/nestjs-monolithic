@@ -17,7 +17,7 @@ export class ThrottleInterceptor implements NestInterceptor {
         const ip = req.ip;
         const minute = new Date().getMinutes();
         const key = `${req.method}_${req.path}_${ip}_${minute}`;
-        const limit = 5;
+        const limit = 20;
         const ttl = 60;
 
         const count = +(await this.redisClient.get(key)) || 0;

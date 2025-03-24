@@ -17,6 +17,10 @@ import { Address } from './common/entities/address.entity';
 import { AddressModule } from './address/address.module';
 import { MappingModule } from './mapping/mapping.module';
 import { Mapping } from './common/entities/mapping.entity';
+import { OrderModule } from './order/order.module';
+import { Order } from './common/entities/order.entity';
+import { OrderProduct } from './common/entities/order.product';
+import { OrderAddress } from './common/entities/order.address';
 
 @Module({
     imports: [
@@ -29,7 +33,7 @@ import { Mapping } from './common/entities/mapping.entity';
             useFactory: (configService: ConfigService) => ({
                 type: configService.get<string>('DB_TYPE') as 'mysql',
                 url: configService.get<string>('DB_URL'),
-                entities: [User, Product, Address, Mapping],
+                entities: [User, Product, Address, Mapping, Order, OrderProduct, OrderAddress],
                 synchronize: configService.get<string>('ENV') === 'dev' ? true : false,
                 ...(configService.get<string>('ENV') === 'prod' && {
                     ssl: {
@@ -45,6 +49,7 @@ import { Mapping } from './common/entities/mapping.entity';
         ProductModule,
         AddressModule,
         MappingModule,
+        OrderModule,
     ],
     controllers: [],
     providers: [

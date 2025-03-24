@@ -11,6 +11,9 @@ export class Mapping {
     @Column()
     price: number;
 
+    @Column({ default: false })
+    hidden: boolean;
+
     @ManyToOne(() => User, user => user.mappings, { nullable: false })
     user: User;
 

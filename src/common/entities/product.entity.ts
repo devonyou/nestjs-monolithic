@@ -1,6 +1,7 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { BaseEntity } from './base.entity';
 import { Mapping } from './mapping.entity';
+import { OrderProduct } from './order.product';
 
 @Entity()
 export class Product extends BaseEntity {
@@ -16,9 +17,12 @@ export class Product extends BaseEntity {
     @Column()
     price: number;
 
-    @Column({ default: 10 })
-    stock: number;
+    @Column({ default: false })
+    hidden: boolean;
 
     @OneToMany(() => Mapping, mapping => mapping.product)
     mappings: Mapping[];
+
+    @OneToMany(() => OrderProduct, orderProduct => orderProduct.product)
+    orderProducts: OrderProduct[];
 }
