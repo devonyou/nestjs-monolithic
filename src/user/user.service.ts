@@ -27,6 +27,11 @@ export class UserService {
         return this.userRepository.findOneBy({ id: userId });
     }
 
+    /* istanbul ignore next */
+    async updateUser(userId: number, dto: UpdateUserDto, qr: QueryRunner) {
+        await qr.manager.getRepository(User).update(userId, dto);
+    }
+
     async update(userId: number, dto: UpdateUserDto, qr: QueryRunner) {
         const { password, ...restDto } = dto;
 
@@ -36,12 +41,16 @@ export class UserService {
             hashedPassword = await bcrypt.hash(password, +hashRounds);
         }
 
-        await qr.manager.getRepository(User).update(userId, {
+        const updateUser = {
             ...restDto,
+            password,
             ...(password ? { password: hashedPassword } : {}),
-        });
+        };
 
-        return await qr.manager.getRepository(User).findOneBy({ id: userId });
+        await this.updateUser(userId, updateUser, qr);
+
+        const user = await qr.manager.getRepository(User).findOneBy({ id: userId });
+        return user;
     }
 
     async remove(userId: number) {
